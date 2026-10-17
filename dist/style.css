@@ -40,7 +40,8 @@ body{position:relative}
 #flight-bearing.is-perched{filter:none}
 #flight-rest-shadow{fill:#52564a;fill-opacity:.18;stroke:none}
 .flight-cloud{fill:var(--paper);stroke:#b9b9ac;stroke-width:.9;stroke-opacity:.58}
-.cloud-experience{fill:#ebece4}
+.cloud-projects{fill:var(--lime)}
+.cloud-research{fill:#e9e9df}
 .cloud-wisp{fill:none;stroke-opacity:.36}
 .experience-row .company h3{transition:color 180ms ease}
 .experience-row.flight-docked .company h3{color:var(--orange)}

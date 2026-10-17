@@ -194,12 +194,15 @@ function setupFlight() {
     svg.setAttribute('viewBox', `0 0 ${width} ${Math.ceil(footer.bottom)}`);
     layer.style.height = `${Math.ceil(footer.bottom)}px`;
     const clouds = layer.querySelectorAll('.flight-cloud');
-    // Clouds frame the project turn, career turn, and final descent in the section breathing room.
-    const cloudPositions = mobile
-      ? [[width - 68, work.top + 26, .7], [width - 66, experience.top + 27, .64], [width - 66, contactBox.top + 26, .66]]
-      : [[width * .64 + 20, work.top + 50, 1.15], [left + 100, experience.top + 32, .95], [width * .75 + 15, contactBox.top + 25, 1.05]];
+    const researchCloudSpace = paper.right - infinity.right;
+    const researchCloudScale = researchCloudSpace >= 80 ? Math.min(.88, (researchCloudSpace - 32) / 110) : 0;
+    const cloudPositions = [
+      [mobile ? network.left + 76 : network.left + network.width * .28, network.top + (mobile ? 67 : 100), mobile ? .66 : .95],
+      [(infinity.right + paper.right) / 2 + 6, infinity.top + infinity.height * .42, researchCloudScale]
+    ];
     clouds.forEach((cloud, i) => {
       const [x, y, size] = cloudPositions[i];
+      cloud.style.display = size ? '' : 'none';
       cloud.setAttribute('transform', `translate(${x} ${y}) scale(${size})`);
     });
     layer.hidden = false;
