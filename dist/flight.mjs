@@ -110,7 +110,7 @@ function setupFlight() {
       add(nux.right - 40, nux.top + 100);
       add(right - 6, pair.bottom - 30);
       add(width * .62, pair.bottom + 60);
-      add(left + 12, experience.top + 60);
+      add(Math.max(8, shell.left - 30), experience.top + 60);
     } else {
       add(width - 12, network.top - 42);
       add(width * .6, network.top + 100);
@@ -122,12 +122,21 @@ function setupFlight() {
       add(width - 12, nux.bottom + 75);
     }
     rows.forEach((row, i) => {
-      const r = row.querySelector('.company').getBoundingClientRect();
-      const y = r.top + scrollY;
-      add(mobile ? width - 15 : left + 10, y + 20);
+      const company = row.querySelector('.company').getBoundingClientRect();
+      const heading = row.querySelector('.company h3').getBoundingClientRect();
+      const bounds = row.getBoundingClientRect();
+      const lane = mobile ? width - 8 : company.right - 28;
+      if (!mobile && i === 0) {
+        add(Math.max(8, shell.left - 30), bounds.top + scrollY - 24);
+        add(lane, bounds.top + scrollY + 10);
+      }
+      add(lane, heading.top + scrollY + heading.height / 2);
       docks.push({ row, index: points.length - 1 });
-      if (!mobile) add(shell.left + 105 + i * 12, y + 125);
+      if (!mobile) add(lane - 14, bounds.bottom + scrollY - 30);
     });
+    if (mobile && paper.right < writing.left) {
+      add(width - 8, rows.at(-1).getBoundingClientRect().bottom + scrollY + 24);
+    }
     if (paper.right < writing.left) {
       const seam = (paper.right + writing.left) / 2;
       add(left - 4, research.top + 50);
