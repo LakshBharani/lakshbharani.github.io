@@ -38,7 +38,8 @@ body{position:relative}
 #flight-trail{stroke:var(--orange);stroke-width:1;stroke-dasharray:2 7;opacity:.24}
 .flight-form{fill:var(--paper);stroke:var(--orange);stroke-width:1.45;opacity:0;transition:opacity 160ms ease}
 .flight-form.is-current{opacity:1}
-#flight-bearing{transform-origin:0 0;transition:transform 180ms ease-out}
+#flight-bearing{transform-origin:0 0;filter:drop-shadow(1px 3px 2px #40382825)}
+#flight-marker{transition:opacity 180ms ease}
 .flight-cloud{fill:var(--paper);stroke:#b5b6aa;stroke-width:1;stroke-opacity:.5}
 .flight-cloud-middle{fill:#ebece4}
 .experience-row .company h3{transition:color 180ms ease}
@@ -47,10 +48,10 @@ body{position:relative}
 @media(prefers-reduced-motion:reduce){.flight-form,#flight-bearing,.experience-row .company h3{transition:none}#flight-trail{display:none}}
 
 .plane-definitions{position:absolute;pointer-events:none;overflow:hidden}
-.plane-far-wing{fill:#fffdf7;stroke:#a49378;stroke-width:.85;stroke-linejoin:round}
-.plane-near-wing{fill:var(--plane-wing,#f4ecdc);stroke:#a49378;stroke-width:.85;stroke-linejoin:round}
-.plane-keel{fill:var(--plane-keel,#bca98a);stroke:#aa9b82;stroke-width:.65;stroke-linejoin:round}
-.plane-crease{fill:none;stroke:var(--orange);stroke-opacity:.72;stroke-width:.65}
+.plane-far-wing{fill:url(#wing-light);stroke:#999b8e;stroke-width:.45;stroke-linejoin:round}
+.plane-near-wing{fill:url(#wing-shade);stroke:#a49378;stroke-width:.85;stroke-linejoin:round}
+.plane-keel{fill:url(#keel-shade);stroke:#a0a293;stroke-width:.45;stroke-linejoin:round}
+.plane-crease{fill:none;stroke:#a0a293;stroke-opacity:.6;stroke-width:.35}
 .intro-open,.intro-open body{overflow:hidden;scroll-behavior:auto}
 .intro-open .flight-layer{opacity:0}
 .flight-intro{position:fixed;inset:0;width:100%;height:100%;height:100dvh;max-width:none;max-height:none;padding:0;border:0;margin:0;background:transparent;color:var(--ink);overflow:hidden}
