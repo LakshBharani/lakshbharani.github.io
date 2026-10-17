@@ -11,6 +11,7 @@ You can also run the workflow manually from the repository's Actions tab.
 
 ```sh
 python3 check.py
+node flight.test.mjs
 python3 -m http.server 4173 --directory dist
 ```
 
@@ -18,3 +19,8 @@ Preview at http://localhost:4173/.
 
 There is no build step, package installation, or deployment secret to maintain.
 Technology icons come from Devicon; the license is in `dist/assets/tech/LICENSE.txt`.
+
+The paper-plane journey is a decorative SVG layer driven by scroll position. Its route
+is measured from the page layout, uses the page margin on mobile, and stays stationary
+when reduced motion is preferred. With JavaScript disabled, the site remains usable
+and the decorative layer stays hidden. The flight logic has no third-party dependencies.

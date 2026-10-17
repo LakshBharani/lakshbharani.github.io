@@ -16,7 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check pages and assets
-        run: python3 check.py
+        run: |
+          python3 check.py
+          node flight.test.mjs
 
   deploy:
     if: github.event_name != 'pull_request'

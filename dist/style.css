@@ -30,3 +30,18 @@
 .hero-bottom>a,.contact-links>a,footer>a{display:inline-flex;align-items:center;gap:4px}
 .contact-arrow .icon-arrow{stroke-width:.9}
 @media(max-width:380px){nav{gap:11px}.wordmark{font-size:30px;letter-spacing:-.09em}.nav-contact{padding:8px 10px;white-space:nowrap}.hero-actions{gap:18px}.hero-actions .button{gap:20px;padding:15px 16px;font-size:12px;white-space:nowrap}}
+
+body{position:relative}
+.flight-layer{position:absolute;inset:0 0 auto;z-index:3;pointer-events:none;overflow:hidden;contain:layout paint}
+.flight-layer[hidden]{display:none}
+.flight-sky{display:block;width:100%;height:100%;overflow:hidden;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#flight-trail{stroke:var(--orange);stroke-width:1;stroke-dasharray:2 7;opacity:.24}
+.flight-form{fill:var(--paper);stroke:var(--orange);stroke-width:1.45;opacity:0;transition:opacity 160ms ease}
+.flight-form.is-current{opacity:1}
+#flight-bearing{transform-origin:0 0;transition:transform 180ms ease-out}
+.flight-cloud{fill:var(--paper);stroke:#b5b6aa;stroke-width:1;stroke-opacity:.5}
+.flight-cloud-middle{fill:#ebece4}
+.experience-row .company h3{transition:color 180ms ease}
+.experience-row.flight-docked .company h3{color:var(--orange)}
+.contact-arrow .icon-arrow{opacity:calc(1 - var(--plane-landing,0))}
+@media(prefers-reduced-motion:reduce){.flight-form,#flight-bearing,.experience-row .company h3{transition:none}#flight-trail{display:none}}
