@@ -145,9 +145,10 @@ function setupFlight() {
     svg.setAttribute('viewBox', `0 0 ${width} ${Math.ceil(footer.bottom)}`);
     layer.style.height = `${Math.ceil(footer.bottom)}px`;
     const clouds = layer.querySelectorAll('.flight-cloud');
+    // Clouds frame the project turn, career turn, and final descent in the section breathing room.
     const cloudPositions = mobile
-      ? [[width - 14, work.top + 25, .43], [width - 14, experience.top + 27, 0], [width - 14, contactBox.top + 23, .35]]
-      : [[width * .66, work.top + 46, 1], [width * .54, experience.top + 43, .78], [width * .62, contactBox.top + 44, .88]];
+      ? [[width - 68, work.top + 26, .7], [width - 66, experience.top + 27, .64], [width - 66, contactBox.top + 26, .66]]
+      : [[width * .64 + 20, work.top + 50, 1.15], [left + 100, experience.top + 32, .95], [width * .75 + 15, contactBox.top + 25, 1.05]];
     clouds.forEach((cloud, i) => {
       const [x, y, size] = cloudPositions[i];
       cloud.setAttribute('transform', `translate(${x} ${y}) scale(${size})`);
