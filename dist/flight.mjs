@@ -80,6 +80,9 @@ function setupFlight() {
     const infra = box('.infra-visual'), nux = box('.nux-visual');
     const experience = box('#experience'), research = box('.research');
     const about = box('#about'), contactBox = box('#contact');
+    const paper = box('.paper'), writing = box('.writing'), infinity = box('.infinity');
+    const paperTitle = box('.paper h3'), writingArt = box('.writing-graphic');
+    const bio = box('.about-grid>div'), facts = box('.about-facts');
     const shell = box('.shell');
     const left = mobile ? width - 10 : Math.max(16, shell.left / 2);
     const right = width - left;
@@ -125,19 +128,50 @@ function setupFlight() {
       docks.push({ row, index: points.length - 1 });
       if (!mobile) add(shell.left + 105 + i * 12, y + 125);
     });
-    if (mobile) {
-      add(width - 28, research.top + 48);
-      add(width - 12, about.top + 50);
+    if (paper.right < writing.left) {
+      const seam = (paper.right + writing.left) / 2;
+      add(left - 4, research.top + 50);
+      add(left - 4, paper.top - 22);
+      add(paper.right - 60, paper.top + 4);
+      add(Math.max(paper.right - 100, infinity.right + 28), (infinity.top + infinity.bottom) / 2);
+      add(seam - 28, paperTitle.top - 12);
+      add(seam - Math.min(20, (writing.left - paper.right) / 2 + (mobile ? 6 : 12)), paper.bottom - 155);
+      add(seam + 8, paper.bottom - 35);
+      add(seam + 85, paper.bottom + 55);
     } else {
-      add(left + 15, research.top - 20);
-      add(width * .32, research.top + 36);
-      add(width * .64, research.top + 62);
-      add(right - 24, research.top + 32);
-      add(right - 12, about.top - 35);
-      add(width * .67, about.top + 45);
-      add(left + 18, about.top + 65);
+      add(width - 14, paper.top - 35);
+      add(width - 12, paper.top + 65);
+      add(paper.right - 54, infinity.top + 35);
+      add(width - 14, paperTitle.top - 8);
+      add(width - 12, paper.bottom - 75);
+      add(width - 12, paper.bottom + 8);
+      add(width * .62, (paper.bottom + writing.top) / 2);
+      add(width - 12, writing.top + 8);
+      add(writing.right - 26, writingArt.top - 25);
+      add(width - 14, writingArt.bottom + 30);
+      add(width - 12, writing.bottom - 75);
+      add(width - 12, writing.bottom + 10);
+      add(width * .68, writing.bottom + 32);
     }
-    add(mobile ? width - 15 : left + 12, about.bottom - 30);
+    if (bio.right < facts.left) {
+      const gap = (bio.right + facts.left) / 2;
+      const sway = Math.max(0, Math.min(18, (facts.left - bio.right) / 2 - (mobile ? 18 : 26)));
+      add(gap + sway * .55, bio.top + 10);
+      add(gap - sway, bio.top + bio.height * .38);
+      add(gap + sway, bio.top + bio.height * .72);
+      add(gap - sway * .88, bio.bottom + 32);
+      add(shell.left + shell.width * .42, about.bottom - 35);
+    } else {
+      add(width - 10, bio.top + 20);
+      add(width - 10, bio.top + bio.height * .48);
+      add(width - 10, bio.bottom - 25);
+      add(width - 10, bio.bottom + 12);
+      add(width * .57, facts.top + 10);
+      add(width - 28, facts.top + 55);
+      add(width - 10, facts.top + facts.height * .6);
+      add(width - 12, facts.bottom + 8);
+      add(width * .72, facts.bottom + 32);
+    }
     if (!mobile) {
       add(width * .35, contactBox.top + 32);
       add(width * .75, contactBox.top + 58);

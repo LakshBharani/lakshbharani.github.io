@@ -36,3 +36,6 @@ The contact arrow remains independent and visible.
 
 Resting poses anchor the center keel to the photo apex/name and the divider endpoint,
 with a flat contact shadow. The flight shadow returns after takeoff.
+
+Research uses the blank space beside the infinity graphic and the card seam; About
+uses a shallow S-curve between columns. Stacked layouts cross only in the gaps.
