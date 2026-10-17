@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { clamp, flightSegment, flightCurve, unwrapAngle } from './dist/flight.mjs';
+import { clamp, flightSegment, flightCurve, unwrapAngle, normalizeStops } from './dist/flight.mjs';
 const stops = [{ scroll: 0 }, { scroll: 100 }, { scroll: 100 }, { scroll: 300 }];
 assert.deepEqual(flightSegment(stops, -20), { index: 0, progress: 0 });
 assert.deepEqual(flightSegment(stops, 50), { index: 0, progress: .5 });
@@ -15,3 +15,13 @@ assert.equal(unwrapAngle(10, 350), -10);
 assert.equal(unwrapAngle(630, -90), 630);
 assert.equal(unwrapAngle(-630, 90), -630);
 console.log('PASS: flight clamping, reverse scroll, duplicate checkpoints, angle wrapping, and safe horizontal/vertical curves');
+
+import { shouldShowIntro } from './dist/intro.mjs';
+assert.equal(shouldShowIntro('', false), true);
+assert.equal(shouldShowIntro('#', false), true);
+assert.equal(shouldShowIntro('#work', false), false);
+assert.equal(shouldShowIntro('', true), false);
+const normalized = normalizeStops([{ x: 0, y: 0, scroll: 0 }, { x: 600, y: 0, scroll: 0 }, { x: 600, y: 0, scroll: 50 }], 60);
+assert.equal(normalized.at(-1).scroll, 60);
+assert.ok(normalized[1].scroll > 0 && normalized[1].scroll < normalized[2].scroll);
+console.log('PASS: intro eligibility and strictly ordered flight checkpoints');

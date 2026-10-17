@@ -24,3 +24,7 @@ The paper-plane journey is a decorative SVG layer driven by scroll position. Its
 is measured from the page layout, uses the page margin on mobile, and stays stationary
 when reduced motion is preferred. With JavaScript disabled, the site remains usable
 and the decorative layer stays hidden. The flight logic has no third-party dependencies.
+
+The raised-paper intro plays once per tab session; section links bypass it. Start flight
+folds the sheet and hands off to the scroll-driven plane. Skip, Escape, and the footer
+Replay intro button provide direct control. Reduced motion enters without the fold.

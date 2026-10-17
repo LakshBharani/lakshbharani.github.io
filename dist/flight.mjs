@@ -1,3 +1,5 @@
+import { setupIntro } from './intro.mjs';
+
 export const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 export function flightSegment(stops, scroll) {
@@ -19,6 +21,18 @@ export function flightCurve(a, b) {
     : `M${a.x},${a.y} C${a.x},${a.y + dy * .45} ${b.x},${b.y - dy * .45} ${b.x},${b.y}`;
 }
 
+export function normalizeStops(points, maxScroll) {
+  const stops = points.map(point => ({ ...point }));
+  for (let i = 1; i < stops.length; i++) {
+    const a = stops[i - 1], b = stops[i];
+    const gap = Math.min(120, Math.max(1, Math.hypot(b.x - a.x, b.y - a.y) * .12));
+    b.scroll = Math.max(a.scroll + gap, b.scroll);
+  }
+  const end = stops.at(-1).scroll;
+  if (end > maxScroll) stops.forEach(stop => { stop.scroll *= maxScroll / end; });
+  return stops;
+}
+
 function setupFlight() {
   const layer = document.querySelector('.flight-layer');
   const svg = layer.querySelector('svg');
@@ -30,7 +44,7 @@ function setupFlight() {
   const contact = document.querySelector('.contact-arrow');
   const rows = [...document.querySelectorAll('.experience-row')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let stops = [], segments = [], docks = [], total = 0, frame = 0, mobile = false, lastAngle = -25;
+  let stops = [], segments = [], docks = [], total = 0, frame = 0, mobile = false, lastAngle = -25, rollStart = 0, rollEnd = 0;
 
   const box = selector => {
     const r = document.querySelector(selector).getBoundingClientRect();
@@ -46,6 +60,7 @@ function setupFlight() {
     const width = document.documentElement.clientWidth, height = innerHeight;
     mobile = width < 960;
     const footer = box('footer'), hero = box('.hero-kicker'), work = box('#work');
+    const network = box('.network-visual');
     const featured = box('.featured'), pair = box('.project-pair');
     const infra = box('.infra-visual'), nux = box('.nux-visual');
     const experience = box('#experience'), research = box('.research');
@@ -61,17 +76,23 @@ function setupFlight() {
     const hold = (x, y, form = 'plane', row = null) => {
       const start = y - height * .59, finish = y - height * .43;
       add(x, y, start, form); add(x, y, finish, form);
-      if (row) docks.push({ row, start, finish });
+      if (row) docks.push({ row, first: points.length - 2, last: points.length - 1 });
     };
     const cross = (from, to, y) => {
       add(from, y, y - height * .75);
       add(to, y, y - height * .3);
     };
 
-    add(left, hero.top + hero.height / 2, 0);
-    if (!mobile) cross(left, right, work.top + 46);
-    hold(mobile ? left : right, featured.top + featured.height * .42, 'packet');
-    if (!mobile) cross(right, middle, pair.top - 12);
+    add(mobile ? width - 8 : shell.right - 36, hero.top + hero.height / 2, 0);
+    if (!mobile) {
+      add(right, work.top - 24);
+      cross(right, left, work.top + 46);
+      add(left, network.top + 92);
+      add(network.right - 42, network.top + 92);
+      hold(network.right - 42, network.bottom - 92, 'packet');
+      add(network.right - 42, featured.bottom + 12);
+      add(middle, pair.top - 12);
+    } else hold(left, featured.top + featured.height * .42, 'packet');
     hold(mobile ? left : middle, infra.top + infra.height * .46, 'cloud');
     // Side-by-side cards share a gutter; the two stops use different heights.
     hold(mobile ? left : middle, mobile ? nux.top + nux.height * .46 : infra.top + infra.height + 90, 'terminal');
@@ -80,6 +101,7 @@ function setupFlight() {
       const r = row.querySelector('.company').getBoundingClientRect();
       hold(left, r.top + scrollY + Math.min(r.height / 2, 25), 'plane', row);
     });
+    rollStart = points.length;
     if (mobile) {
       hold(left, research.top + 28, 'infinity');
     } else {
@@ -88,14 +110,16 @@ function setupFlight() {
       add(left, y, start);
       [[x, y], [x + 32, y - 15], [x + 54, y], [x + 32, y + 15], [x, y], [x - 32, y - 15], [x - 54, y], [x - 32, y + 15], [x, y], [left, y]].forEach(([px, py], i) => add(px, py, start + duration * (i + 1) / 10));
     }
+    rollEnd = points.length - 1;
     hold(left, about.top + about.height * .45);
     if (!mobile) cross(left, right, contactBox.top + 44);
     add(mobile ? left : right, end.top - 34, maxScroll - height * .22);
     add(end.left + end.width / 2, end.top + end.height / 2, maxScroll);
 
-    // Closely spaced checkpoints can overlap on short screens; preserve their order.
-    stops = points;
-    for (let i = 1; i < stops.length; i++) stops[i].scroll = Math.max(stops[i - 1].scroll, stops[i].scroll);
+    stops = normalizeStops(points, maxScroll);
+    docks.forEach(dock => { dock.start = stops[dock.first].scroll; dock.finish = stops[dock.last].scroll; });
+    rollStart = stops[rollStart].scroll;
+    rollEnd = stops[rollEnd].scroll;
     geometry.replaceChildren(); total = 0;
     segments = stops.slice(1).map((b, index) => {
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -134,7 +158,13 @@ function setupFlight() {
     lastAngle = unwrapAngle(lastAngle, angle);
     const scale = (mobile ? .5 : .9) + landing * (mobile ? .5 : .6);
     marker.setAttribute('transform', `translate(${p.x} ${p.y}) scale(${scale})`);
-    bearing.style.transform = `rotate(${lastAngle}deg)`;
+    const tangentBefore = pointAt(distance - 18), tangentAfter = pointAt(distance + 18);
+    const incoming = Math.atan2(p.y - tangentBefore.y, p.x - tangentBefore.x) * 180 / Math.PI;
+    const outgoing = Math.atan2(tangentAfter.y - p.y, tangentAfter.x - p.x) * 180 / Math.PI;
+    const bank = clamp(unwrapAngle(incoming, outgoing) - incoming, -45, 45);
+    const roll = !mobile && !reduced.matches ? clamp((scroll - rollStart) / Math.max(1, rollEnd - rollStart), 0, 1) : 0;
+    const tilt = Math.cos(roll * Math.PI * 2) * (1 - Math.abs(bank) / 110);
+    bearing.style.transform = `rotate(${lastAngle}deg) scaleY(${tilt}) skewX(${bank * .18}deg)`;
     let form = 'plane';
     if (a.form === b.form) form = a.form;
     else if (a.form !== 'plane' && progress < .18) form = a.form;
@@ -158,4 +188,7 @@ function setupFlight() {
   measure();
 }
 
-if (typeof document !== 'undefined' && document.querySelector('.flight-layer')) setupFlight();
+if (typeof document !== 'undefined' && document.querySelector('.flight-layer')) {
+  setupFlight();
+  setupIntro();
+}
