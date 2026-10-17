@@ -30,4 +30,6 @@ folds the sheet and hands off to the scroll-driven plane. Skip, Escape, and the 
 Replay intro button provide direct control. Reduced motion enters without the fold.
 
 The flight spline shares tangents between segments and never stops at intermediate
-checkpoints. Its paper surfaces have distinct wing/keel shading; it softens near text.
+checkpoints. The smaller plane retains its paper shape, size, and opacity throughout.
+It starts on the portrait (or name on small screens) and rests on the footer divider.
+The contact arrow remains independent and visible.

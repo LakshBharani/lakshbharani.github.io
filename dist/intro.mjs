@@ -50,7 +50,7 @@ export function setupIntro() {
     launch = plane.animate([
       { transform: 'rotate(-18deg) scale(1)', offset: 0 },
       { transform: `translate(${dx * .6}px,${dy * .82}px) rotate(-28deg) scale(${Math.max(scale, .5)})`, offset: .65 },
-      { transform: `translate(${dx}px,${dy}px) rotate(-25deg) scale(${scale})`, offset: 1 }
+      { transform: `translate(${dx}px,${dy}px) rotate(-12deg) scale(${scale})`, offset: 1 }
     ], { duration: 1050, easing: 'cubic-bezier(.35,0,.25,1)', fill: 'forwards' });
     await launch.finished.catch(() => {});
     if (run === generation && dialog.open) finish();

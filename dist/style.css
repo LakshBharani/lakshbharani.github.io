@@ -36,16 +36,12 @@ body{position:relative}
 .flight-layer[hidden]{display:none}
 .flight-sky{display:block;width:100%;height:100%;overflow:hidden;fill:none;stroke-linecap:round;stroke-linejoin:round}
 #flight-trail{stroke:var(--orange);stroke-width:1;stroke-dasharray:2 7;opacity:.24}
-.flight-form{fill:var(--paper);stroke:var(--orange);stroke-width:1.45;opacity:0;transition:opacity 160ms ease}
-.flight-form.is-current{opacity:1}
 #flight-bearing{transform-origin:0 0;filter:drop-shadow(1px 3px 2px #40382825)}
-#flight-marker{transition:opacity 180ms ease}
 .flight-cloud{fill:var(--paper);stroke:#b5b6aa;stroke-width:1;stroke-opacity:.5}
 .flight-cloud-middle{fill:#ebece4}
 .experience-row .company h3{transition:color 180ms ease}
 .experience-row.flight-docked .company h3{color:var(--orange)}
-.contact-arrow .icon-arrow{opacity:calc(1 - var(--plane-landing,0))}
-@media(prefers-reduced-motion:reduce){.flight-form,#flight-bearing,.experience-row .company h3{transition:none}#flight-trail{display:none}}
+@media(prefers-reduced-motion:reduce){#flight-bearing,.experience-row .company h3{transition:none}#flight-trail{display:none}}
 
 .plane-definitions{position:absolute;pointer-events:none;overflow:hidden}
 .plane-far-wing{fill:url(#wing-light);stroke:#999b8e;stroke-width:.45;stroke-linejoin:round}

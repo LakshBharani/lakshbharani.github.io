@@ -1,4 +1,4 @@
-import { setupIntro } from './intro.mjs';
+import { setupIntro } from './intro.mjs?v=perched-plane';
 
 export const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -47,11 +47,9 @@ function setupFlight() {
   const trail = layer.querySelector('#flight-trail');
   const marker = layer.querySelector('#flight-marker');
   const bearing = layer.querySelector('#flight-bearing');
-  const forms = [...layer.querySelectorAll('.flight-form')];
-  const contact = document.querySelector('.contact-arrow');
   const rows = [...document.querySelectorAll('.experience-row')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let stops = [], segments = [], docks = [], total = 0, frame = 0, mobile = false, lastAngle = -25, readable = [];
+  let stops = [], segments = [], docks = [], total = 0, frame = 0, mobile = false, lastAngle = -12;
 
   const box = selector => {
     const r = document.querySelector(selector).getBoundingClientRect();
@@ -66,12 +64,12 @@ function setupFlight() {
   function measure() {
     const width = document.documentElement.clientWidth, height = innerHeight;
     mobile = width < 960;
-    const footer = box('footer'), hero = box('.hero-kicker'), work = box('#work');
+    const footer = box('footer'), hero = box('.hero-kicker'), portrait = box('.portrait-wrap'), work = box('#work');
     const network = box('.network-visual');
     const pair = box('.project-pair');
     const infra = box('.infra-visual'), nux = box('.nux-visual');
     const experience = box('#experience'), research = box('.research');
-    const about = box('#about'), end = box('.contact-arrow'), contactBox = box('#contact');
+    const about = box('#about'), contactBox = box('#contact');
     const shell = box('.shell');
     const left = mobile ? width - 10 : Math.max(16, shell.left / 2);
     const right = width - left;
@@ -79,46 +77,42 @@ function setupFlight() {
     const maxScroll = Math.max(0, footer.bottom - height);
     const points = [];
     docks = [];
-    const add = (x, y, scroll = y - height * .52, form = 'plane') => points.push({ x, y, scroll: clamp(scroll, 0, maxScroll), form });
-    const hold = (x, y, form = 'plane', row = null) => {
-      add(x, y, y - height * .52, form);
-      if (row) docks.push({ row, index: points.length - 1 });
-    };
-
-
-    add(mobile ? width - 26 : shell.right - 80, hero.top + hero.height / 2, 0);
+    const add = (x, y, scroll = y - height * .52) => points.push({ x, y, scroll: clamp(scroll, 0, maxScroll) });
+    // Small screens hide the portrait, so the name becomes the launch perch.
+    add(portrait.width ? portrait.right - 46 : hero.left + 68, portrait.width ? portrait.top + 26 : hero.top - 10, 0);
     if (!mobile) {
       add(right - 10, work.top - 120);
       add(width * .64, work.top + 18);
       add(left + 8, work.top + 62);
       add(left + 12, network.top + 30);
       add(network.left + network.width * .35, network.top + 112);
-      hold(network.right - 55, network.bottom - 115, 'packet');
+      add(network.right - 55, network.bottom - 115);
       add(middle - 30, pair.top + 32);
-      hold(infra.left + 60, infra.top + 115, 'cloud');
+      add(infra.left + 60, infra.top + 115);
       add(middle, infra.bottom - 22);
-      hold(nux.right - 40, nux.top + 100, 'terminal');
+      add(nux.right - 40, nux.top + 100);
       add(right - 6, pair.bottom - 30);
       add(width * .62, pair.bottom + 60);
       add(left + 12, experience.top + 60);
     } else {
       add(width - 12, network.top - 42);
       add(width * .6, network.top + 100);
-      hold(width - 32, network.bottom - 95, 'packet');
+      add(width - 32, network.bottom - 95);
       add(width - 12, infra.top - 30);
-      hold(width * .73, infra.top + 90, 'cloud');
+      add(width * .73, infra.top + 90);
       add(width - 12, infra.bottom + 50);
-      hold(width * .78, nux.top + 75, 'terminal');
+      add(width * .78, nux.top + 75);
       add(width - 12, nux.bottom + 75);
     }
     rows.forEach((row, i) => {
       const r = row.querySelector('.company').getBoundingClientRect();
       const y = r.top + scrollY;
-      hold(mobile ? width - 15 : left + 10, y + 20, 'plane', row);
+      add(mobile ? width - 15 : left + 10, y + 20);
+      docks.push({ row, index: points.length - 1 });
       if (!mobile) add(shell.left + 105 + i * 12, y + 125);
     });
     if (mobile) {
-      hold(width - 28, research.top + 48, 'infinity');
+      add(width - 28, research.top + 48);
       add(width - 12, about.top + 50);
     } else {
       add(left + 15, research.top - 20);
@@ -134,8 +128,9 @@ function setupFlight() {
       add(width * .35, contactBox.top + 32);
       add(width * .75, contactBox.top + 58);
     }
-    add(mobile ? width - 20 : right - 30, end.top - 50, maxScroll - height * .2);
-    add(end.left + end.width / 2, end.top + end.height / 2, maxScroll);
+    const perchX = footer.right - (mobile ? 52 : 90);
+    add(perchX - (mobile ? 65 : 120), footer.top - 62, maxScroll - height * .2);
+    add(perchX, footer.top - (mobile ? 14 : 21), maxScroll);
 
     stops = normalizeStops(points, maxScroll);
     docks.forEach(dock => { dock.start = stops[dock.index].scroll - 55; dock.finish = stops[dock.index].scroll + 55; });
@@ -157,10 +152,6 @@ function setupFlight() {
       const [x, y, size] = cloudPositions[i];
       cloud.setAttribute('transform', `translate(${x} ${y}) scale(${size})`);
     });
-    readable = [...document.querySelectorAll('main h1, main h2, main h3, main p, main li, main a, .tags, .visual-top, .visual-bottom, .terminal-body, .routes>span, .flow-main, .intent')].map(element => {
-      const r = element.getBoundingClientRect();
-      return { left: r.left, right: r.right, top: r.top + scrollY, bottom: r.bottom + scrollY };
-    });
     layer.hidden = false;
     render();
   }
@@ -175,28 +166,21 @@ function setupFlight() {
     const p = pointAt(distance), before = pointAt(distance - 3), after = pointAt(distance + 3);
     let angle = Math.atan2(after.y - before.y, after.x - before.x) * 180 / Math.PI;
     const landing = !reduced.matches && index === segments.length - 1 ? eased : 0;
-    if (scroll <= 1) angle = -25;
-    if (landing > 0) angle = angle * (1 - landing) - 25 * landing;
+    if (scroll <= 1) angle = -12;
+    if (landing > 0) angle = angle * (1 - landing) - 12 * landing;
     lastAngle = unwrapAngle(lastAngle, angle);
-    const scale = (mobile ? .65 : 1.05) + landing * (mobile ? .5 : .6);
+    const scale = mobile ? .55 : .82;
     marker.setAttribute('transform', `translate(${p.x} ${p.y}) scale(${scale})`);
     const tangentBefore = pointAt(distance - 18), tangentAfter = pointAt(distance + 18);
     const incoming = Math.atan2(p.y - tangentBefore.y, p.x - tangentBefore.x) * 180 / Math.PI;
     const outgoing = Math.atan2(tangentAfter.y - p.y, tangentAfter.x - p.x) * 180 / Math.PI;
-    const bank = clamp(unwrapAngle(incoming, outgoing) - incoming, -45, 45);
+    const bank = scroll <= 1 || landing >= 1 ? 0 : clamp(unwrapAngle(incoming, outgoing) - incoming, -45, 45);
     bearing.style.transform = `rotate(${lastAngle}deg) scaleY(${1 - Math.abs(bank) / 180}) skewX(${bank * .12}deg)`;
-    const obscuresText = readable.some(r => p.x + 24 > r.left && p.x - 24 < r.right && p.y + 17 > r.top && p.y - 17 < r.bottom);
-    marker.style.opacity = obscuresText && landing < .8 ? '.18' : '1';
-    const checkpoint = stops.find(stop => stop.form !== 'plane' && Math.abs(scroll - stop.scroll) < 70);
-    const form = checkpoint?.form || 'plane';
-    forms.forEach(shape => shape.classList.toggle('is-current', shape.dataset.form === form));
-    contact.style.setProperty('--plane-landing', landing.toFixed(3));
     rows.forEach(row => row.classList.toggle('flight-docked', !reduced.matches && docks.some(d => d.row === row && scroll >= d.start && scroll <= d.finish)));
     const tail = [];
     for (let d = Math.max(0, distance - (mobile ? 75 : 160)); d <= distance; d += 5) {
       const point = pointAt(d); tail.push(`${tail.length ? 'L' : 'M'}${point.x.toFixed(1)},${point.y.toFixed(1)}`);
     }
-    trail.style.opacity = obscuresText ? '.08' : '.22';
     trail.setAttribute('d', reduced.matches || landing > .95 ? '' : tail.join(' '));
   }
 
