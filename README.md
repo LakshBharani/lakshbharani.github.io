@@ -33,3 +33,6 @@ The flight spline shares tangents between segments and never stops at intermedia
 checkpoints. The smaller plane retains its paper shape, size, and opacity throughout.
 It starts on the portrait (or name on small screens) and rests on the footer divider.
 The contact arrow remains independent and visible.
+
+Resting poses anchor the center keel to the photo apex/name and the divider endpoint,
+with a flat contact shadow. The flight shadow returns after takeoff.

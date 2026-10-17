@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { clamp, flightSegment, flightCurve, unwrapAngle, normalizeStops } from './dist/flight.mjs';
+import { clamp, flightSegment, flightCurve, unwrapAngle, normalizeStops, planePerch, REST_ANGLE } from './dist/flight.mjs';
 const stops = [{ scroll: 0 }, { scroll: 100 }, { scroll: 100 }, { scroll: 300 }];
 assert.deepEqual(flightSegment(stops, -20), { index: 0, progress: 0 });
 assert.deepEqual(flightSegment(stops, 50), { index: 0, progress: .5 });
@@ -34,3 +34,12 @@ console.log('PASS: intro eligibility and strictly ordered flight checkpoints');
 
 const edge = controls(flightCurve({ x: 36, y: 100 }, { x: 40, y: 400 }, { x: 1100, y: 60 }, { x: 300, y: 500 }, 1280));
 assert.ok(edge.filter((_, i) => i % 2 === 0).every(x => x >= 16 && x <= 1264));
+
+for (const scale of [.55, .82]) {
+  const anchor = { x: 320, y: 600 };
+  const origin = planePerch(anchor, scale), angle = REST_ANGLE * Math.PI / 180;
+  const contact = { x: origin.x + (-7 * Math.cos(angle) - 20 * Math.sin(angle)) * .82 * scale,
+    y: origin.y + (-7 * Math.sin(angle) + 20 * Math.cos(angle)) * .82 * scale };
+  assert.ok(Math.abs(contact.x - anchor.x) < 1e-10 && Math.abs(contact.y - anchor.y) < 1e-10);
+}
+console.log('PASS: folded keel touches its support at desktop and mobile scale');

@@ -1,4 +1,4 @@
-import { setupIntro } from './intro.mjs?v=perched-plane';
+import { setupIntro } from './intro.mjs?v=grounded-plane';
 
 export const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -40,6 +40,15 @@ export function normalizeStops(points, maxScroll) {
   return stops;
 }
 
+export const REST_ANGLE = 18;
+export function planePerch(anchor, scale) {
+  // The keel tip (-7, 20), rather than the SVG box, touches the support.
+  const radians = REST_ANGLE * Math.PI / 180;
+  const x = (-7 * Math.cos(radians) - 20 * Math.sin(radians)) * .82 * scale;
+  const y = (-7 * Math.sin(radians) + 20 * Math.cos(radians)) * .82 * scale;
+  return { x: anchor.x - x, y: anchor.y - y };
+}
+
 function setupFlight() {
   const layer = document.querySelector('.flight-layer');
   const svg = layer.querySelector('svg');
@@ -47,9 +56,10 @@ function setupFlight() {
   const trail = layer.querySelector('#flight-trail');
   const marker = layer.querySelector('#flight-marker');
   const bearing = layer.querySelector('#flight-bearing');
+  const restShadow = layer.querySelector('#flight-rest-shadow');
   const rows = [...document.querySelectorAll('.experience-row')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let stops = [], segments = [], docks = [], total = 0, frame = 0, mobile = false, lastAngle = -12;
+  let stops = [], segments = [], docks = [], total = 0, frame = 0, mobile = false, lastAngle = REST_ANGLE, startAnchor, endAnchor;
 
   const box = selector => {
     const r = document.querySelector(selector).getBoundingClientRect();
@@ -78,8 +88,12 @@ function setupFlight() {
     const points = [];
     docks = [];
     const add = (x, y, scroll = y - height * .52) => points.push({ x, y, scroll: clamp(scroll, 0, maxScroll) });
-    // Small screens hide the portrait, so the name becomes the launch perch.
-    add(portrait.width ? portrait.right - 46 : hero.left + 68, portrait.width ? portrait.top + 26 : hero.top - 10, 0);
+    const scale = mobile ? .55 : .82;
+    startAnchor = portrait.width
+      ? { x: portrait.left + portrait.width / 2, y: portrait.top + 2 }
+      : { x: hero.left + 68, y: hero.top + 2 };
+    const launch = planePerch(startAnchor, scale);
+    add(launch.x, launch.y, 0);
     if (!mobile) {
       add(right - 10, work.top - 120);
       add(width * .64, work.top + 18);
@@ -128,9 +142,10 @@ function setupFlight() {
       add(width * .35, contactBox.top + 32);
       add(width * .75, contactBox.top + 58);
     }
-    const perchX = footer.right - (mobile ? 52 : 90);
-    add(perchX - (mobile ? 65 : 120), footer.top - 62, maxScroll - height * .2);
-    add(perchX, footer.top - (mobile ? 14 : 21), maxScroll);
+    endAnchor = { x: footer.right - (mobile ? 24 : 40), y: footer.top };
+    const perch = planePerch(endAnchor, scale);
+    add(perch.x - (mobile ? 65 : 120), footer.top - 62, maxScroll - height * .2);
+    add(perch.x, perch.y, maxScroll);
 
     stops = normalizeStops(points, maxScroll);
     docks.forEach(dock => { dock.start = stops[dock.index].scroll - 55; dock.finish = stops[dock.index].scroll + 55; });
@@ -167,16 +182,22 @@ function setupFlight() {
     const p = pointAt(distance), before = pointAt(distance - 3), after = pointAt(distance + 3);
     let angle = Math.atan2(after.y - before.y, after.x - before.x) * 180 / Math.PI;
     const landing = !reduced.matches && index === segments.length - 1 ? eased : 0;
-    if (scroll <= 1) angle = -12;
-    if (landing > 0) angle = angle * (1 - landing) - 12 * landing;
+    if (index === 0) angle = REST_ANGLE + (unwrapAngle(REST_ANGLE, angle) - REST_ANGLE) * clamp(progress / .15, 0, 1);
+    if (landing > 0) angle = angle * (1 - landing) + REST_ANGLE * landing;
+    const parked = scroll <= 1 || landing > .995;
+    if (parked) angle = REST_ANGLE;
     lastAngle = unwrapAngle(lastAngle, angle);
     const scale = mobile ? .55 : .82;
     marker.setAttribute('transform', `translate(${p.x} ${p.y}) scale(${scale})`);
     const tangentBefore = pointAt(distance - 18), tangentAfter = pointAt(distance + 18);
     const incoming = Math.atan2(p.y - tangentBefore.y, p.x - tangentBefore.x) * 180 / Math.PI;
     const outgoing = Math.atan2(tangentAfter.y - p.y, tangentAfter.x - p.x) * 180 / Math.PI;
-    const bank = scroll <= 1 || landing >= 1 ? 0 : clamp(unwrapAngle(incoming, outgoing) - incoming, -45, 45);
+    const bank = parked ? 0 : (1 - landing) * clamp(unwrapAngle(incoming, outgoing) - incoming, -45, 45);
     bearing.style.transform = `rotate(${lastAngle}deg) scaleY(${1 - Math.abs(bank) / 180}) skewX(${bank * .12}deg)`;
+    const anchor = scroll <= 1 ? startAnchor : endAnchor;
+    restShadow.style.display = parked ? '' : 'none';
+    restShadow.setAttribute('transform', `translate(${anchor.x} ${anchor.y + .5}) scale(${scale})`);
+    bearing.classList.toggle('is-perched', parked);
     rows.forEach(row => row.classList.toggle('flight-docked', !reduced.matches && docks.some(d => d.row === row && scroll >= d.start && scroll <= d.finish)));
     const tail = [];
     for (let d = Math.max(0, distance - (mobile ? 75 : 160)); d <= distance; d += 5) {
