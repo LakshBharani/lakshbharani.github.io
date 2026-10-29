@@ -1,4 +1,4 @@
-import { setupIntro } from './intro.mjs?v=grounded-plane';
+import { setupIntro } from './intro.mjs?v=optional-intro';
 
 export const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 

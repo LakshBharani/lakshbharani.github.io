@@ -112,3 +112,13 @@ body{position:relative}
 @media(max-width:560px){.hero-tagline{font-size:30px;margin-top:18px}.wordmark{font-size:20px}nav{gap:14px}.nav-contact{padding:8px 10px}}
 
 .teacher-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.teacher-card{padding:16px;border:1px solid #cec9bd;border-radius:6px;transition:background 150ms ease,border-color 150ms ease}.teacher-card:hover{background:var(--paper);border-color:var(--orange)}.teacher-card img{width:56px;height:56px;object-fit:cover;border-radius:50%;margin-bottom:12px}.teacher-name{display:block;font-size:13px;font-weight:600;line-height:1.4}.teacher-channel{display:flex;justify-content:space-between;font:10px/1.5 var(--mono);color:var(--muted);margin-top:6px}
+
+/* Bring engineering evidence forward while keeping the paper-and-ink layout. */
+.hero{padding-top:40px}.hero-kicker{margin-bottom:24px}.hero-bottom{margin-top:32px;padding-block:20px}
+.experience-highlight{display:grid;grid-template-columns:1fr 1.2fr;gap:48px;padding-block:36px;border-bottom:1px solid var(--line)}
+.highlight-copy h2{font-size:28px;margin-top:12px;letter-spacing:-.04em}.highlight-copy>p:not(.eyebrow){max-width:440px;font-size:13px;color:var(--muted);margin-top:14px}.highlight-copy .text-link{margin-top:16px}
+.highlight-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-self:center;margin:0}.highlight-metrics dt{font-family:Manrope,Arial,sans-serif;font-size:clamp(28px,3vw,42px);font-weight:600;letter-spacing:-.055em;line-height:1.2}.highlight-metrics dd{margin:9px 0 0;font-size:12px;color:var(--muted);max-width:150px}
+.work.section{padding-block:64px}.project-actions{display:flex;flex-wrap:wrap;gap:12px 24px}.project-actions .project-link{justify-content:flex-start;gap:10px}
+.tech-strip{padding-block:16px 36px}
+@media(max-width:800px){.experience-highlight{gap:28px;grid-template-columns:1fr}.highlight-metrics{max-width:600px}.highlight-metrics dd{max-width:180px}.work.section{padding-block:48px}}
+@media(max-width:560px){.hero{padding-top:30px}.hero-bottom{margin-top:26px}.experience-highlight{padding-block:28px;gap:24px}.highlight-copy h2{font-size:27px}.highlight-metrics{gap:14px}.highlight-metrics dt{font-size:29px}.highlight-metrics dd{font-size:11px}.project-actions{gap:8px 20px}.project-actions .project-link{margin-top:16px}.tech-strip{padding-block:8px 30px}}

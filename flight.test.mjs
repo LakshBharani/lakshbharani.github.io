@@ -22,15 +22,40 @@ assert.equal(unwrapAngle(630, -90), 630);
 assert.equal(unwrapAngle(-630, 90), -630);
 console.log('PASS: flight clamping, reverse scroll, duplicate checkpoints, angle wrapping, and continuous curved tangents');
 
-import { shouldShowIntro } from './dist/intro.mjs';
-assert.equal(shouldShowIntro('', false), true);
-assert.equal(shouldShowIntro('#', false), true);
-assert.equal(shouldShowIntro('#work', false), false);
-assert.equal(shouldShowIntro('', true), false);
+import { setupIntro } from './dist/intro.mjs';
+const element = () => ({ hidden: true, disabled: false, events: {},
+  addEventListener(name, handler) { this.events[name] = handler; }, focus() {} });
+const start = element(), skip = element(), replay = element();
+let shows = 0, closes = 0;
+const dialog = { ...element(), classList: { remove() {} },
+  showModal() { shows++; this.open = true; }, close() { closes++; this.open = false; },
+  querySelector(selector) { return selector === '.intro-start' ? start : selector === '.intro-skip' ? skip : {}; } };
+globalThis.document = { querySelector(selector) { return selector === '#flight-intro' ? dialog : selector === '.intro-replay' ? replay : start; },
+  documentElement: { classList: { add() {}, remove() {} } } };
+globalThis.matchMedia = () => ({ matches: true, addEventListener() {} });
+globalThis.scrollTo = () => {};
+setupIntro();
+assert.equal(shows, 0, 'A fresh visit must show the portfolio without a modal');
+assert.equal(replay.hidden, false, 'The optional intro remains discoverable');
+replay.events.click();
+assert.equal(shows, 1, 'The intro opens only after an explicit click');
+await start.events.click();
+assert.equal(closes, 1, 'Reduced motion enters directly without the folding animation');
+replay.events.click();
+skip.events.click();
+assert.equal(closes, 2, 'Skip returns to the portfolio');
+replay.events.click();
+let prevented = false;
+dialog.events.cancel({ preventDefault() { prevented = true; } });
+assert.equal(prevented, true);
+assert.equal(closes, 3, 'Escape returns to the portfolio');
+delete globalThis.document;
+delete globalThis.matchMedia;
+delete globalThis.scrollTo;
 const normalized = normalizeStops([{ x: 0, y: 0, scroll: 0 }, { x: 600, y: 0, scroll: 0 }, { x: 600, y: 0, scroll: 50 }], 60);
 assert.equal(normalized.at(-1).scroll, 60);
 assert.ok(normalized[1].scroll > 0 && normalized[1].scroll < normalized[2].scroll);
-console.log('PASS: intro eligibility and strictly ordered flight checkpoints');
+console.log('PASS: optional intro controls and strictly ordered flight checkpoints');
 
 const edge = controls(flightCurve({ x: 36, y: 100 }, { x: 40, y: 400 }, { x: 1100, y: 60 }, { x: 300, y: 500 }, 1280));
 assert.ok(edge.filter((_, i) => i % 2 === 0).every(x => x >= 16 && x <= 1264));

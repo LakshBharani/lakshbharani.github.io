@@ -25,7 +25,8 @@ is measured from the page layout, uses continuous curves through quiet visual ar
 when reduced motion is preferred. With JavaScript disabled, the site remains usable
 and the decorative layer stays hidden. The flight logic has no third-party dependencies.
 
-The raised-paper intro plays once per tab session; section links bypass it. Start flight
+The portfolio opens directly on the main content. The optional raised-paper intro opens
+only from the footer’s Watch flight intro button. Start flight
 folds the sheet and hands off to the scroll-driven plane. Skip, Escape, and the footer
 Replay intro button provide direct control. Reduced motion enters without the fold.
 

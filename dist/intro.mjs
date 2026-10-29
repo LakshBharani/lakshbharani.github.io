@@ -1,7 +1,3 @@
-export function shouldShowIntro(hash, entered) {
-  return !entered && (!hash || hash === '#');
-}
-
 export function setupIntro() {
   const dialog = document.querySelector('#flight-intro');
   if (!dialog || typeof dialog.showModal !== 'function') return;
@@ -10,12 +6,9 @@ export function setupIntro() {
   const plane = dialog.querySelector('.intro-plane');
   const replay = document.querySelector('.intro-replay');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const sessionKey = 'laksh-flight-entered';
   let generation = 0, launch = null;
-  const remember = () => { try { sessionStorage.setItem(sessionKey, '1'); } catch {} };
   const finish = () => {
     generation++;
-    remember();
     dialog.close();
     launch?.cancel();
     document.documentElement.classList.remove('intro-open');
@@ -33,7 +26,6 @@ export function setupIntro() {
   };
   start.addEventListener('click', async () => {
     if (start.disabled) return;
-    remember();
     if (reduced.matches) { finish(); return; }
     const run = ++generation;
     start.disabled = true;
@@ -60,7 +52,4 @@ export function setupIntro() {
   reduced.addEventListener('change', () => { if (reduced.matches && dialog.open) finish(); });
   replay.hidden = false;
   replay.addEventListener('click', show);
-  let entered = false;
-  try { entered = sessionStorage.getItem(sessionKey) === '1'; } catch {}
-  if (shouldShowIntro(location.hash, entered)) show();
 }
